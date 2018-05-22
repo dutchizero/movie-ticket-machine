@@ -6,26 +6,23 @@ import {Provider} from 'react-redux';
 import {createStore,applyMiddleware,combineReducers} from "redux";
 
 const initialState={
-	PricePerTicket: 0,
+	PricePerTicket: null,
 	Price: 0,
-	Ticket: 0,
+	Ticket: null,
 	MovieName: '',
-	MoneyReceived: 0,
+	MoneyReceived: null,
+	ArrChange:[],
+	ExchangeMoney: 0,
+	isInputCorrect: false,
+	Image: '',
 }
 
 const DataReducer = (state=initialState,action)=>{
 	switch(action.type){
 		case "setPricePerTicket":
 			state={
-				// result:state.result+=action.payload,
 				...state,
 				PricePerTicket:action.payload
-			}
-		break;
-		case "setAge":
-			state={
-				...state,
-				age:action.payload
 			}
 		break;
 		case "setTicket":
@@ -58,14 +55,38 @@ const DataReducer = (state=initialState,action)=>{
 				MoneyReceived:action.payload
 			}
 		break;
-		default:
+		case "setArrChange":
+			state={
+				...state,
+				ArrChange:action.payload
+			}
+		break;
+		case "setExchaneMoney":
+			state={
+				...state,
+				ExchangeMoney:action.payload
+			}
+		break;
+		case "setInputCorrect":
+			state={
+				...state,
+				isInputCorrect:action.payload
+			}
+		break;
+		case "setImgage":
+			state={
+				...state,
+				Image:action.payload
+			}
+		break;
+		default: 
 	}
 	return state;
 }
 
 
 const mylogger=(store)=>(next)=>(action)=>{
-	console.log("LogACtion",action);
+	console.log("LogAction",action);
 	next(action);
 }
 
@@ -73,11 +94,6 @@ const store=createStore(combineReducers({data:DataReducer}),applyMiddleware(mylo
 store.subscribe(()=>{
 	console.log("Update Store:",store.getState());
 })
-
-store.dispatch({
-	type:"setName",
-	payload:"test"
-});
 
 
 export default()=>(
