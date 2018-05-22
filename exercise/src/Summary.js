@@ -1,18 +1,24 @@
-import React, { Component } from 'react';
+import React from 'react';
+import {Link} from 'react-router-dom';
+import {connect} from 'react-redux';
 
-class Summary extends Component {
-
-  constructor(props){
-  	super();
-  	console.log("Hello World");
-  }
+class Summary extends React.Component {
+  // Rending Html
   render() {
-        return (
-          <div>
-          	Hello Summary
-          </div>
-        );
-  }
+      return (
+        <div>
+            total price {this.props.data.Price} baht <br/>
+            Recieved Money {this.props.data.MoneyReceived}<br/>
+        </div>
+      );
+    }
 }
 
-export default Summary;
+const mapStatetoProps=(state)=>{
+    return {
+      data:state.data
+    }
+}
+
+
+export default connect(mapStatetoProps)(Summary);

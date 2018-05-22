@@ -1,5 +1,6 @@
 import React from 'react';
-import {BrowserRouter,Route,Switch,Link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
+import {connect} from 'react-redux';
 
 class Home extends React.Component {
   //Declare State
@@ -8,12 +9,6 @@ class Home extends React.Component {
     this.state = {
       Data: [],
       isLoaded: false,
-      PricePerTicket: 0,
-      Price: 0,
-      Ticket: 0,
-      MovieName: '',
-      MovieID:'',
-      MoneyReceived: 0,
     }
   }
   async componentDidMount() {
@@ -22,18 +17,15 @@ class Home extends React.Component {
       .then(res=>res.json())
       .then(
         (result)=>{
-          // console.log(result.data);
+          console.log(result.data);
           var temp=result.data;
           console.log(this.state.Data);
           for (var i = 0; i < temp.length; i++) {
             // console.log(result.data[i].now_showing);
             // Set default movie Data
             if(i===0){
-              this.setState({
-                PricePerTicket:result.data[i].price,
-                MovieName:result.data[i].name,
-                MovieID:result.data[i].id
-              });
+              this.props.setPricePerTicket(result.data[i].price);
+              this.props.setMovie(result.data[i].name);
             }
             if(result.data[i].now_showing===true){
               this.state.Data.push(result.data[i]);
@@ -47,30 +39,39 @@ class Home extends React.Component {
   //Calulate total price if there're any change on input tag
   setTicket(event){
     // console.log(event.target.value);
-    this.setState({Ticket:event.target.value})
-    let PricePerOne=this.state.PricePerTicket;
+    this.props.setTicket(event.target.value);
+    let PricePerOne=this.props.data.PricePerTicket;
     let ticket=event.target.value;
-    this.setState({Price:ticket*PricePerOne});
+    var Price=ticket*PricePerOne;
+    this.props.setPrice(Price);
   }
 
   //Set movie to state and calulate total price 
   setMovie(event){
-    // console.log(event.target.value);
-    this.setState({PricePerTicket:event.target.value});
-    let ticket=this.state.ticket;
-    let PricePerOne=event.target.value;
-    this.setState({Price:ticket*PricePerOne});
+    console.log(event.target.value);
+    for (var i = 0; i < this.state.Data.length; i++) {
+      if(this.state.Data[i].id==event.target.value){
+        //console.log('hee');
+        this.props.setMovie(this.state.Data[i].name);
+        this.props.setPricePerTicket(this.state.Data[i].price);
+        let ticket=this.props.data.Ticket;
+        let PricePerOne=this.state.Data[i].price;
+        var Price=ticket*PricePerOne;
+        this.props.setPrice(Price);
+      }
+    }
   }
 
   //Sending data to Summary page
   LinkPurchaseSummary(event){
     console.log("linked");
-    this.prosp.history.push('/Summary?MisterDeddy');
+    //this.props.setPricePerTicket("MisterDeddy");
   }
 
   //Set received money to state
   setReceivedMoney(event){
-    this.setState({MoneyReceived:event.target.value});
+    //this.setState({MoneyReceived:event.target.value});
+    this.props.setReceivedMoney(event.target.value);
   }
   // Rending Html
   render() {
@@ -84,9 +85,9 @@ class Home extends React.Component {
         <div>
         please select movie<select onChange={this.setMovie.bind(this)}>{listData}</select><br/>
         please input number of ticket<input id = "ticket" type="number" min = "0" onChange={this.setTicket.bind(this)}/><br/>
-        total price {this.state.Price} baht        
+        total price {this.props.data.Price} baht <br/>
         Money received<input id = "received" type="number" min = "0" onChange={this.setReceivedMoney.bind(this)}/><br/>
-        <Link to="/Summary"><button type = "submit" onClick={this.LinkPurchaseSummary.bind(this)}>ซื้อ</button></Link>
+        <Link to='Summary'><button type = "submit" onClick={this.LinkPurchaseSummary.bind(this)}>ซื้อ</button></Link>
         </div>
       );
     }else{
@@ -95,4 +96,46 @@ class Home extends React.Component {
   }
 }
 
-export default Home;
+const mapStatetoProps=(state)=>{
+    return {
+      data:state.data
+    }
+}
+
+const mapDispatchtoProps=(dispatch)=>{
+    return {
+      setPricePerTicket:(inputdata)=>{
+        dispatch({
+          type:"setPricePerTicket",
+          payload:inputdata
+        });
+      },setTicket:(inputdata)=>{
+        dispatch({
+          type:"setTicket",
+          payload:inputdata
+        });
+      },setMovie:(inputdata)=>{
+        dispatch({
+          type:"setMovie",
+          payload:inputdata
+        });
+      },setMovieID:(inputdata)=>{
+        dispatch({
+          type:"setMovieID",
+          payload:inputdata
+        });
+      },setPrice:(inputdata)=>{
+        dispatch({
+          type:"setPrice",
+          payload:inputdata
+        });
+      },setReceivedMoney:(inputdata)=>{
+        dispatch({
+          type:"setReceivedMoney",
+          payload:inputdata
+        });
+      }
+    }
+}
+
+export default connect(mapStatetoProps,mapDispatchtoProps)(Home);
