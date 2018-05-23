@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-
+import {Link} from 'react-router-dom';
 
 class Summary extends React.Component {
   // Rending Html
@@ -18,12 +18,13 @@ class Summary extends React.Component {
 				      		<div class="col-sm-4" style={{marginLeft:50}}>
 				      			<img src={this.props.data.Image}/>
 				      		</div>
-				      		<div class="col-sm-4" style={{marginTop:80}}>
+				      		<div class="col-sm-6" style={{marginTop:80}}>
 						        {this.props.data.MovieName} x {this.props.data.Ticket}<br/>
-						        Money received {this.props.data.MoneyReceived} baht<br/>
-						        Total price {this.props.data.Price} baht <br/>
-						        Exchange money {this.props.data.ExchangeMoney} baht<br/>
-						        Exchange banknote or coin {this.props.data.ArrChange.toString()}
+						        Money received : {this.props.data.MoneyReceived} baht<br/>
+						        Total price : {this.props.data.Price} baht <br/>
+						        Exchange money : {this.props.data.ExchangeMoney} baht<br/>
+						        Exchange banknote or coin : {this.props.data.ArrChange.toString()}<br/><br/>
+						     	<Link to="/"><button style={{fontSize:16,height:'auto',width:'auto',textAlign:'right'}} class="btn btn-success" type = "submit" >กลับไปยังหน้าแรก</button></Link>
 					        </div>
 				        </div>
 			        </div>
