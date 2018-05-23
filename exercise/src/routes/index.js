@@ -86,13 +86,13 @@ const DataReducer = (state=initialState,action)=>{
 
 
 const mylogger=(store)=>(next)=>(action)=>{
-	console.log("LogAction",action);
+	// console.log("LogAction",action);
 	next(action);
 }
 
 const store=createStore(combineReducers({data:DataReducer}),applyMiddleware(mylogger));
 store.subscribe(()=>{
-	console.log("Update Store:",store.getState());
+	// console.log("Update Store:",store.getState());
 })
 
 

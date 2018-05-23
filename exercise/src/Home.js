@@ -10,8 +10,6 @@ class Home extends React.Component {
       Data: [],
       isLoaded: false,
       ArrMoney: [1000, 500, 100, 50, 20, 10, 5, 2, 1],
-      ArrSelected: [],
-      MovieName: 'test',
     }
   }
   async componentDidMount() {
@@ -31,17 +29,17 @@ class Home extends React.Component {
                 this.props.setPricePerTicket(result.data[i].price);
                 this.props.setMovie(result.data[i].name);
                 this.props.setImgage(result.data[i].image);
+                result.data[i].className="demo w3-hover-opacity-off";
                 isFirstData=0;
-                result.data[i].isSelect="false";
               }else{
-                result.data[i].isSelect="false";
+                result.data[i].className="demo w3-opacity w3-hover-opacity-off";
               }
               this.state.Data.push(result.data[i]);
             }
           }
           this.setState({isLoaded:true});
         });
-      console.log(this.state.Data);
+      // console.log(this.state.Data);
   }
 
   //Calulate total price if there're any change on input tag
@@ -51,13 +49,14 @@ class Home extends React.Component {
     let PricePerOne=this.props.data.PricePerTicket;
     let ticket=event.target.value;
     var Price=ticket*PricePerOne;
-    console.log(PricePerOne);
+    // console.log(PricePerOne);
     this.props.setPrice(Price);
   }
 
   //Set movie to state and calulate total price 
   setMovie(event){
-    console.log(event.target.value);
+    // console.log(event.target.value);
+    let TempArr = this.state.Data;
     for (var i = 0; i < this.state.Data.length; i++) {
       if(this.state.Data[i].id==event.target.value){
         this.props.setMovie(this.state.Data[i].name);
@@ -67,13 +66,17 @@ class Home extends React.Component {
         var Price=ticket*PricePerOne;
         this.props.setPrice(Price);
         this.props.setImgage(this.state.Data[i].image);
+        TempArr[i].className="demo w3-hover-opacity-off";
+      }else{
+        TempArr[i].className="demo w3-opacity w3-hover-opacity-off";
       }
     }
+    this.setState({Data:TempArr});
   }
 
   //Sending data to Summary page
   LinkPurchaseSummary(event){
-    console.log("linked");
+    // console.log("linked");
     //Check input of Ticket
     if((this.props.data.Ticket==null)||(this.props.data.Ticket==0)){
       //if input data is 0 or null alert user to input variable
@@ -129,8 +132,9 @@ class Home extends React.Component {
     //console.log(this.props.data.MovieName);
   }
 
+  //Choose movie from poster
   ClickPicture(event){
-    //console.log(event.target.id);
+    let TempArr = this.state.Data;
     for (var i = 0; i < this.state.Data.length; i++) {
       if(this.state.Data[i].id==event.target.id){
         //console.log("found"+event.target.id+"and data[i]"+this.state.Data[i].id);
@@ -141,10 +145,15 @@ class Home extends React.Component {
         var Price=ticket*PricePerOne;
         this.props.setPrice(Price);
         this.props.setImgage(this.state.Data[i].image);
-        console.log(document.getElementById("Selector").value);
         document.getElementById("Selector").value = this.state.Data[i].id;
+        // console.log(TempArr[i].className);
+        TempArr[i].className="demo w3-hover-opacity-off";
+      }else{
+        TempArr[i].className="demo w3-opacity w3-hover-opacity-off";
       }
     }
+    //Update state
+    this.setState({Data:TempArr});
   }
   // Rending Html
   render() {
@@ -156,15 +165,16 @@ class Home extends React.Component {
     const listSmallImage=list2.map((list2=>
       <div class="col-sm-3">
         <input type="hidden" value = {list2.id}/>
-        <img onClick={this.ClickPicture.bind(this)} class="demo w3-opacity w3-hover-opacity-off" id ={list2.id} style={{ cursor: 'pointer' }}  src={list2.image}/>
+        <img onClick={this.ClickPicture.bind(this)} name={"img"+list2.id} className={list2.className} id ={list2.id} style={{ cursor: 'pointer' }}  src={list2.image}/>
       </div>
     ));
     if(this.state.isLoaded===true){
       return (
         <div>
+          <h1 style={{textAlign:'center'}}>Welcome to Movie Ticket Machine</h1>
           <div class="row" style={{marginTop :50,marginButtom:50}}>
             <div class="col-sm-12">
-                  {listSmallImage}
+              {listSmallImage}
             </div>
             <div class="col-sm-12">
               <div class="col-sm-4">
@@ -182,7 +192,7 @@ class Home extends React.Component {
                   Total price {this.props.data.Price} baht <br/><br/>
                   Money received 
                   <input style={{fontSize:16,height:30}} class="form-control" id = "received" type="number" min = "0" onChange={this.setReceivedMoney.bind(this)}/>
-                  <Link to="Summary"><button style={{fontSize:16,height:30,width:70}} class="btn btn-success" type = "submit" onClick={this.LinkPurchaseSummary.bind(this)}>ซื้อ</button></Link>
+                  <Link to="Summary"><button style={{fontSize:16,height:40,width:70}} class="btn btn-success" type = "submit" onClick={this.LinkPurchaseSummary.bind(this)}>ซื้อ</button></Link>
                 </form>
               </div>
             </div>
