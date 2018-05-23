@@ -188,10 +188,10 @@ class Home extends React.Component {
                     {listData}
                   </select>
                   Please input number of ticket 
-                  <input style={{fontSize:16,height:35}} class="form-control" id = "ticket" type="number" min = "0" onChange={this.setTicket.bind(this)}/><br/>
+                  <input style={{fontSize:16,height:35}} class="form-control" id = "ticket" type="number" min = "0" onChange={this.setTicket.bind(this)}/>
                   Total price {this.props.data.Price} baht <br/><br/>
                   Money received 
-                  <input style={{fontSize:16,height:30}} class="form-control" id = "received" type="number" min = "0" onChange={this.setReceivedMoney.bind(this)}/>
+                  <input style={{fontSize:16,height:30}} class="form-control" id = "received" type="number" min = "0" onChange={this.setReceivedMoney.bind(this)}/><br/>
                   <Link to="Summary"><button style={{fontSize:16,height:40,width:70}} class="btn btn-success" type = "submit" onClick={this.LinkPurchaseSummary.bind(this)}>ซื้อ</button></Link>
                 </form>
               </div>
