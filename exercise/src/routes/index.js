@@ -6,15 +6,16 @@ import {Provider} from 'react-redux';
 import {createStore,applyMiddleware,combineReducers} from "redux";
 
 const initialState={
-	PricePerTicket: null,
+	PricePerTicket: 0,
 	Price: 0,
-	Ticket: null,
+	Ticket: 0,
 	MovieName: '',
-	MoneyReceived: null,
+	MoneyReceived: 0,
 	ArrChange:[],
 	ExchangeMoney: 0,
 	isInputCorrect: false,
 	Image: '',
+	ArrObjChange: []
 }
 
 const DataReducer = (state=initialState,action)=>{
@@ -77,6 +78,12 @@ const DataReducer = (state=initialState,action)=>{
 			state={
 				...state,
 				Image:action.payload
+			}
+		break;
+		case "setArrObjChange":
+			state={
+				...state,
+				ArrObjChange:action.payload
 			}
 		break;
 		default: 

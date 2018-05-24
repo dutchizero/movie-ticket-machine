@@ -10,8 +10,15 @@ class Home extends React.Component {
       Data: [],
       isLoaded: false,
       ArrMoney: [1000, 500, 100, 50, 20, 10, 5, 2, 1],
+      TicketMessage: '',
+      MoneyReceivedMessage: '',
+      isTicketCorrect: false,
+      isMoneyReceivedCorrect: false,
+      isBtnDisable: true,
     }
+    this.ValidateInput = this.ValidateInput.bind(this);
   }
+
   async componentDidMount() {
     // Get data from API and Assign to state
     await fetch("http://www.mocky.io/v2/5af178123000003700ba7ff2",{method:'get'})
@@ -44,13 +51,20 @@ class Home extends React.Component {
 
   //Calulate total price if there're any change on input tag
   setTicket(event){
-    // console.log(event.target.value);
-    this.props.setTicket(event.target.value);
+
+    console.log('setTicket'+event.target.value);
+    let TempTicket = parseInt(event.target.value);
+    this.props.setTicket(TempTicket);
     let PricePerOne=this.props.data.PricePerTicket;
     let ticket=event.target.value;
+    if(isNaN(event.target.value)){
+      this.props.setTicket(0);
+      ticket=0;
+    }
     var Price=ticket*PricePerOne;
     // console.log(PricePerOne);
     this.props.setPrice(Price);
+    this.ValidateInput(TempTicket,this.props.data.MoneyReceived,this.props.data.ExchageMoney,Price);
   }
 
   //Set movie to state and calulate total price 
@@ -67,6 +81,7 @@ class Home extends React.Component {
         this.props.setPrice(Price);
         this.props.setImgage(this.state.Data[i].image);
         TempArr[i].className="demo w3-hover-opacity-off";
+        this.ValidateInput(this.props.data.Ticket,this.props.data.MoneyReceived,this.props.data.ExchageMoney,Price);
       }else{
         TempArr[i].className="demo w3-opacity w3-hover-opacity-off";
       }
@@ -75,61 +90,15 @@ class Home extends React.Component {
   }
 
   //Sending data to Summary page
-  LinkPurchaseSummary(event){
-    // console.log("linked");
-    //Check input of Ticket
-    if((this.props.data.Ticket==null)||(this.props.data.Ticket==0)){
-      //if input data is 0 or null alert user to input variable
-      alert("Please input ticket that you want to buy");
-      window.location = '/';
-    }else{
-      //Check input of money
-      if((this.props.data.MoneyReceived==0)||(this.props.data.MoneyReceived==null)){
-        //if input data is 0 or null alert user to input variable
-        alert("Please input money");
-        window.location = '/';
-      }else{
-        //Prepare variable for push to state
-        let ExchangeMoney = this.props.data.MoneyReceived-this.props.data.Price;
-        //Check money ,Is that money enough for buy a ticket
-        if(ExchangeMoney<0){
-          //If dosen't enough aleart message to user to input more money
-          alert("Money is not enough for ticket");
-          window.location = '/';
-        }else{
-          this.props.setInputCorrect(true);
-          let IndexArrMoney = 0;
-          let ArrChange = [];
-          if(ExchangeMoney===0){
-            //If input money is equal to total price push "-" to Array
-            let tempArrChange=["-"]
-            this.props.setArrChange(tempArrChange);
-          }else{
-            //Loop until all exchange money is a banknote or coin
-            this.props.setExchaneMoney(ExchangeMoney);
-            while(ExchangeMoney>0){
-              //Check exchange money can separate into which banknote or coin
-              if(parseInt((ExchangeMoney/this.state.ArrMoney[IndexArrMoney]),10)>0){
-                //Push that banknote or coin into array
-                ExchangeMoney = ExchangeMoney-this.state.ArrMoney[IndexArrMoney];
-                ArrChange.push(this.state.ArrMoney[IndexArrMoney]);
-              }else{
-                //If can't separate into this banknote or coin,Let move to next index
-                IndexArrMoney++;
-              }
-            }
-            this.props.setArrChange(ArrChange);
-          }
-        }
-      }
-    }
-  }
 
   //Set received money to state
   setReceivedMoney(event){
     //this.setState({MoneyReceived:event.target.value});
-    this.props.setReceivedMoney(event.target.value);
-    //console.log(this.props.data.MovieName);
+    let TempMoney=parseInt(event.target.value);
+    this.props.setReceivedMoney(TempMoney);
+    let ExchageMoney = TempMoney-this.props.data.Price;
+    this.props.setExchaneMoney(ExchageMoney);
+    this.ValidateInput(this.props.data.Ticket,event.target.value,this.props.data.ExchageMoney,this.props.data.Price);
   }
 
   //Choose movie from poster
@@ -141,6 +110,10 @@ class Home extends React.Component {
         this.props.setMovie(this.state.Data[i].name);
         this.props.setPricePerTicket(this.state.Data[i].price);
         let ticket=this.props.data.Ticket;
+        if(isNaN(ticket)){
+          this.props.setTicket(0);
+          ticket=0;
+        }
         let PricePerOne=this.state.Data[i].price;
         var Price=ticket*PricePerOne;
         this.props.setPrice(Price);
@@ -148,6 +121,7 @@ class Home extends React.Component {
         document.getElementById("Selector").value = this.state.Data[i].id;
         // console.log(TempArr[i].className);
         TempArr[i].className="demo w3-hover-opacity-off";
+        this.ValidateInput(this.props.data.Ticket,this.props.data.MoneyReceived,this.props.data.ExchageMoney,Price);
       }else{
         TempArr[i].className="demo w3-opacity w3-hover-opacity-off";
       }
@@ -155,6 +129,97 @@ class Home extends React.Component {
     //Update state
     this.setState({Data:TempArr});
   }
+
+  ValidateInput(Ticket,MoneyReceived,ExchangeMoney,Price){
+    ExchangeMoney = MoneyReceived - Price;
+    let isMoneyReceivedCorrect = this.state.isMoneyReceivedCorrect;
+    let isTicketCorrect = this.state.isTicketCorrect;
+    if((ExchangeMoney<0)||(Price>MoneyReceived)){
+      if(MoneyReceived!=0){
+        this.setState({MoneyReceivedMessage:'จำนวนเงินต้องไม่น้อยกว่า Total Price',isMoneyReceivedCorrect:false});
+        this.setState({isBtnDisable:true});
+        isMoneyReceivedCorrect = false;
+      }else{
+
+      }      
+    }else{
+      this.setState({MoneyReceivedMessage:'',isMoneyReceivedCorrect:true});
+      isMoneyReceivedCorrect = true;
+    }
+
+    if((Ticket<0)){
+      this.setState({TicketMessage:'กรุณากรอกเฉพาะจำนวนมากกว่า 0',isTicketCorrect:false});
+      this.setState({isBtnDisable:true});
+      this.props.setPrice(0);
+      isTicketCorrect = false;
+    }else{
+      this.setState({TicketMessage:'',isTicketCorrect:true});
+      isTicketCorrect = true;
+    }
+
+    if(((isMoneyReceivedCorrect===true)&&(isTicketCorrect==true))&&(Ticket!=0)&&(MoneyReceived!=0)){
+      this.props.setExchaneMoney(ExchangeMoney);
+      this.setState({isBtnDisable:false});
+      this.props.setInputCorrect(true);
+      let IndexArrMoney = 0;
+      let ArrChange = [];
+      if(ExchangeMoney===0){
+        //If input money is equal to total price push "-" to Array
+        let tempArrChange=["-"]
+        this.props.setArrChange(tempArrChange);
+        this.props.setArrObjChange(tempArrChange);
+      }else{
+        //Loop until all exchange money is a banknote or coin
+        this.props.setExchaneMoney(ExchangeMoney);
+        let tempArrObjChange=[];
+        let count = 0;
+        while(ExchangeMoney>0){
+          //Check exchange money can separate into which banknote or coin
+          if(parseInt((ExchangeMoney/this.state.ArrMoney[IndexArrMoney]),10)>0){
+            //Push that banknote or coin into array
+            ExchangeMoney = ExchangeMoney-this.state.ArrMoney[IndexArrMoney];
+            ArrChange.push(this.state.ArrMoney[IndexArrMoney]);
+            count++;
+          }else{
+            //If can't separate into this banknote or coin,Let move to next index
+            console.log("Arrmoney:"+this.state.ArrMoney[IndexArrMoney]);
+            console.log("count:"+count);
+            if(count>0){
+              let TempObj={
+                BankOrCoin:this.state.ArrMoney[IndexArrMoney],
+                NumberOfBankOrCoin:count
+              }
+              tempArrObjChange.push(TempObj);
+            }
+            IndexArrMoney++;
+            count=0;
+          }
+        }
+        if(count>0){
+          let TempObj={
+            BankOrCoin:this.state.ArrMoney[IndexArrMoney],
+            NumberOfBankOrCoin:count
+          }
+          tempArrObjChange.push(TempObj);
+        }else{
+          count=0;
+        }
+        this.props.setArrObjChange(tempArrObjChange);
+        this.props.setArrChange(ArrChange);
+      }
+    }else{
+      this.setState({isBtnDisable:true});
+      this.props.setInputCorrect(false);
+    }
+    console.log("Ticket:"+Ticket);
+    console.log("MoneyReceived"+MoneyReceived);
+    console.log("ExchageMoney"+ExchangeMoney);
+    console.log("Price"+Price);
+    console.log("isBtnDisable"+this.state.isBtnDisable);
+    console.log("isMoneyReceivedCorrect"+this.state.isMoneyReceivedCorrect);
+    console.log("isTicketCorrect"+this.state.isTicketCorrect);
+  }
+
   // Rending Html
   render() {
     const list=this.state.Data;
@@ -189,10 +254,12 @@ class Home extends React.Component {
                   </select>
                   Please input number of ticket 
                   <input style={{fontSize:16,height:35}} class="form-control" id = "ticket" type="number" min = "0" onChange={this.setTicket.bind(this)}/>
-                  Total price {this.props.data.Price} baht <br/><br/>
+                  <p style={{color:'red'}}>{this.state.TicketMessage}</p>
+                  Total price {this.props.data.Price} baht <br/><br/><input type="hidden" value={this.props.data.Price} id="Price"/>
                   Money received 
                   <input style={{fontSize:16,height:30}} class="form-control" id = "received" type="number" min = "0" onChange={this.setReceivedMoney.bind(this)}/><br/>
-                  <Link to="Summary"><button style={{fontSize:16,height:40,width:70}} class="btn btn-success" type = "submit" onClick={this.LinkPurchaseSummary.bind(this)}>ซื้อ</button></Link>
+                  <p style={{color:'red'}}>{this.state.MoneyReceivedMessage}</p>
+                  <Link to="Summary"><button style={{fontSize:16,height:40,width:70}} disabled={this.state.isBtnDisable} class="btn btn-success" type = "submit">ซื้อ</button></Link>
                 </form>
               </div>
             </div>
@@ -261,6 +328,11 @@ const mapDispatchtoProps=(dispatch)=>{
       },setImgage:(inputdata)=>{
         dispatch({
           type:"setImgage",
+          payload:inputdata
+        });
+      },setArrObjChange:(inputdata)=>{
+        dispatch({
+          type:"setArrObjChange",
           payload:inputdata
         });
       }
