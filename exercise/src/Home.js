@@ -51,8 +51,7 @@ class Home extends React.Component {
 
   //Calulate total price if there're any change on input tag
   setTicket(event){
-
-    console.log('setTicket'+event.target.value);
+    //console.log('setTicket'+event.target.value);
     let TempTicket = parseInt(event.target.value);
     this.props.setTicket(TempTicket);
     let PricePerOne=this.props.data.PricePerTicket;
@@ -131,6 +130,7 @@ class Home extends React.Component {
   }
 
   ValidateInput(Ticket,MoneyReceived,ExchangeMoney,Price){
+    this.setState({isBtnDisable:false});
     ExchangeMoney = MoneyReceived - Price;
     let isMoneyReceivedCorrect = this.state.isMoneyReceivedCorrect;
     let isTicketCorrect = this.state.isTicketCorrect;
@@ -153,8 +153,14 @@ class Home extends React.Component {
       this.props.setPrice(0);
       isTicketCorrect = false;
     }else{
-      this.setState({TicketMessage:'',isTicketCorrect:true});
-      isTicketCorrect = true;
+      if((Ticket!=0)&&(isNaN(Ticket))==0){
+        this.setState({TicketMessage:'',isTicketCorrect:true});
+        isTicketCorrect = true;
+      }
+    }
+
+    if(isNaN(Ticket)){
+      isTicketCorrect = false;
     }
 
     if(((isMoneyReceivedCorrect===true)&&(isTicketCorrect==true))&&(Ticket!=0)&&(MoneyReceived!=0)){
@@ -182,8 +188,8 @@ class Home extends React.Component {
             count++;
           }else{
             //If can't separate into this banknote or coin,Let move to next index
-            console.log("Arrmoney:"+this.state.ArrMoney[IndexArrMoney]);
-            console.log("count:"+count);
+            //console.log("Arrmoney:"+this.state.ArrMoney[IndexArrMoney]);
+            //console.log("count:"+count);
             if(count>0){
               let TempObj={
                 BankOrCoin:this.state.ArrMoney[IndexArrMoney],
@@ -195,6 +201,7 @@ class Home extends React.Component {
             count=0;
           }
         }
+        //Make sure that last ChangeObject has been add
         if(count>0){
           let TempObj={
             BankOrCoin:this.state.ArrMoney[IndexArrMoney],
@@ -211,13 +218,6 @@ class Home extends React.Component {
       this.setState({isBtnDisable:true});
       this.props.setInputCorrect(false);
     }
-    console.log("Ticket:"+Ticket);
-    console.log("MoneyReceived"+MoneyReceived);
-    console.log("ExchageMoney"+ExchangeMoney);
-    console.log("Price"+Price);
-    console.log("isBtnDisable"+this.state.isBtnDisable);
-    console.log("isMoneyReceivedCorrect"+this.state.isMoneyReceivedCorrect);
-    console.log("isTicketCorrect"+this.state.isTicketCorrect);
   }
 
   // Rending Html
