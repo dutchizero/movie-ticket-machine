@@ -1,7 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
-import './theme/Home.css';
 class Home extends React.Component {
   //Declare State
   constructor(){
